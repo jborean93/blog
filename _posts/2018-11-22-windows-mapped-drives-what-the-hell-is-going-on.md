@@ -7,7 +7,6 @@ categories: ["ansible", "windows"]
 description: "Mapped drives have always been a curiosity for me, I’ve used them before in the past but usually come across an issue that forces me to abandon them. Alongside my curiosity, there has also been some demand in Ansible to be able to manage mapped drives and in my naivety I created a very basic …"
 ---
 
-{% raw %}
 Mapped drives have always been a curiosity for me, I’ve used them before in the past but usually come across an issue that forces me to abandon them. Alongside my curiosity, there has also been some demand in Ansible to be able to manage mapped drives and in my naivety I created a very basic module [win_mapped_drive](https://docs.ansible.com/ansible/latest/modules/win_mapped_drive_module.html) to do this. At the time it worked for what I needed to do and I had to use some hacks and workarounds to actually enumerate the existing mappings when running in WinRM. I should have read the warning signs then and given up but I pushed on ahead and the module was released with Ansible 2.4. We are now in the 2.8 development phase and there’s been a few issues crop up on GitHub saying the module doesn’t work as expected. I decided to take the time to look into the complex world of mapped drives and come up with a more satisfactory solution for managing them with Ansible.
 
 The end result was [a complete rewrite of win_mapped_drive](https://github.com/ansible/ansible/pull/48642) and a really bad headache from trying to understand how this all fits together. I decided to try and put down what I learnt to help anybody who needs to deal with mapped drives as it isn’t easy.
@@ -325,6 +324,7 @@ Throughout this post I’ve mostly covered Windows only topics but the main reas
 
 This achieves the same result as running `net use Z: \\server\share /persistent:yes` but it includes all the idempotency checks and abstracts all the complex code required to achieve this through WinRM. If you need to create a mapped drive that requires authentication you can achieve this in two tasks;
 
+{% raw %}
 ```
 - name: create a credential for the network resource
   win_credential:
@@ -355,6 +355,7 @@ This achieves the same result as running `net use Z: \\server\share /persistent:
     ansible_become_user: '{{ ansible_user }}'
     ansible_become_pass: '{{ ansible_password }}'
 ```
+{% endraw %}
 
 The first task will use create a Windows Credential for the network host `server` under the become user’s credential vault and the second task will use those credentials when saving the mapped drive. Any future interactive logon sessions for that user will be able to see that drive and it will automatically use the credentials that were created in the first task.
 
@@ -419,4 +420,3 @@ I’ve talked about some pretty low level Windows concepts in this post and thou
 - when using credentials, use the Credential Manager to save the credential for the remote host
 - when using the `/user:` parameter of `net use`, the drive will fail to map on the next logon, use the Credential Manager instead
 - and lastly, use the `win_mapped_drive` and `win_credential` modules with Ansible to easily manage these resources 🙂
-{% endraw %}

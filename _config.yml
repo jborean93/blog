@@ -22,8 +22,14 @@ show_excerpts: true
 header_pages:
   - about.md
 
+# Setting exclude replaces Jekyll's defaults, so they are repeated here.
 exclude:
   - README.md
   - Gemfile
   - Gemfile.lock
   - wordpress-export
+  - vendor
+  - .bundle
+  - .jekyll-cache
+  - .sass-cache
+  - node_modules

@@ -122,8 +122,18 @@ def front_matter(fields: dict) -> str:
 
 
 def protect_liquid(md: str) -> str:
-    if "{{" in md or "{%" in md:
-        return "{% raw %}\n" + md + "{% endraw %}\n"
+    """Wrap code blocks containing Liquid-like syntax in raw tags."""
+
+    def wrap(m):
+        block = m.group(0)
+        if "{{" in block or "{%" in block:
+            return "{% raw %}\n" + block + "\n{% endraw %}"
+        return block
+
+    md = re.sub(r"^```.*?^```$", wrap, md, flags=re.M | re.S)
+    outside = re.sub(r"\{% raw %\}.*?\{% endraw %\}", "", md, flags=re.S)
+    if "{{" in outside or "{%" in outside:
+        raise ValueError("Liquid-like syntax found outside a code block")
     return md
 
 
