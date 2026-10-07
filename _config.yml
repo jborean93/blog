@@ -1,0 +1,29 @@
+title: Blogging for Logging
+description: My thoughts logged into blog form
+author: Jordan Borean
+url: "https://www.bloggingforlogging.com"
+baseurl: ""
+github_username: jborean93
+timezone: UTC
+
+theme: minima
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+markdown: kramdown
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+
+show_excerpts: true
+
+header_pages:
+  - about.md
+
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - wordpress-export
